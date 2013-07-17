@@ -1,0 +1,40 @@
+{
+  "name": "morton-page",
+  "version": "0.0.0",
+  "description": "Morton order index for multidimensional pages",
+  "main": "zpage.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "bit-interleave": "~0.0.0"
+  },
+  "devDependencies": {
+    "tape": "~1.0.4"
+  },
+  "scripts": {
+    "test": "tap test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mikolalysenko/morton-page.git"
+  },
+  "keywords": [
+    "morton",
+    "page",
+    "z",
+    "order",
+    "interleave",
+    "curve",
+    "hash",
+    "table",
+    "index"
+  ],
+  "author": "Mikola Lysenko",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "cbe8973ec8314f30d7b4a701b2b480ae3884d138",
+  "bugs": {
+    "url": "https://github.com/mikolalysenko/morton-page/issues"
+  }
+}
