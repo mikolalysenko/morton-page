@@ -1,5 +1,6 @@
 "use strict"
 
+var isProperty = require("is-property")
 var interleave = require("bit-interleave")
 
 function createPageConstructor(n, page_bits, page_shift, key) {
@@ -7,8 +8,12 @@ function createPageConstructor(n, page_bits, page_shift, key) {
   for(var i=0; i<n; ++i) {
     arglist[i] = "x"+i
   }
+  
+  var useDot = isProperty(key)
+  var keyStr = useDot ? "." + key : "['" + key + "']"
+
   var code = ["'use strict'"]
-  var className = "MortonCache" + n + "b" + page_bits
+  var className = ["MortonCache", n, "b", page_bits].join("")
 
   //Create constructor
   code.push(["function ",className,"(sz){",
@@ -19,10 +24,11 @@ function createPageConstructor(n, page_bits, page_shift, key) {
   code.push(["var proto=",className,".prototype"].join(""))
   code.push("proto.bits="+page_bits)
   code.push("proto.shift="+page_shift)
+  code.push("proto.key='" + key + "'")
   
   //pages.add():
   code.push("proto.add=function(page){")
-    code.push(["this.pages[(interleave.apply(undefined, page['",key,"'])>>",page_shift,")&",(1<<page_bits)-1,"].push(page)"].join(""))
+    code.push(["this.pages[(interleave.apply(undefined, page", keyStr, ")>>",page_shift,")&",(1<<page_bits)-1,"].push(page)"].join(""))
   code.push("}")
   
   //pages.get():
@@ -33,7 +39,7 @@ function createPageConstructor(n, page_bits, page_shift, key) {
   code.push(["proto.get=function(",arglist.join(","),"){",
     "var pages=this.pages[(interleave(",arglist.join(","),")>>",page_shift,")&",(1<<page_bits)-1,"],n=pages.length;",
     "for(var i=0;i<n;++i){",
-      "var p=pages[i],k=pages[i]['",key,"'];",
+      "var p=pages[i],k=p", keyStr, ";",
       "if(",matched.join("&&"),"){ return p }",
     "}",
     "return null }"
@@ -43,7 +49,7 @@ function createPageConstructor(n, page_bits, page_shift, key) {
   code.push(["proto.remove=function(", arglist.join(","), "){",
     "var pages=this.pages[(interleave(", arglist.join(","), ")>>",page_shift,")&", (1<<page_bits)-1,"],n=pages.length;",
     "for(var i=0;i<n;++i){",
-      "var k=pages[i]['",key,"'];",
+      "var k=pages[i]", keyStr, ";",
       "if(", matched.join("&&"), "){pages[i]=pages[pages.length-1];pages.pop();break;}",
     "}",
   "}"

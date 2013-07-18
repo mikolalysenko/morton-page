@@ -1,13 +1,14 @@
 {
   "name": "morton-page",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Morton order index for multidimensional pages",
   "main": "zpage.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
-    "bit-interleave": "~0.0.0"
+    "bit-interleave": "~0.0.0",
+    "is-property": "0.0.0"
   },
   "devDependencies": {
     "tape": "~1.0.4"

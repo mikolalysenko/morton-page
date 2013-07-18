@@ -34,12 +34,13 @@ var createPageStore = require("morton-page")
 
 ### Constructor
 
-#### `var store = createPageStore(dimension, log_size[, shift])`
+#### `var store = createPageStore(dimension, log_size[, shift, key])`
 Creates a z-order page store.
 
 * `dimension` is the dimension of the pages
 * `log_size` is the log base 2 of the number of buckets in the store
-* `shift` is the number of bits to shift each page by before indexing
+* `shift` is the number of bits to shift each page by before indexing (default: `0`)
+* `key` is the property of each page to use for the index (default: `"key"`)
 
 **Returns** An instance of a `MortonPageStore` class specialized for the given input parameters.
 
