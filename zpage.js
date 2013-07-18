@@ -2,7 +2,7 @@
 
 var interleave = require("bit-interleave")
 
-function createPageConstructor(n, page_bits, page_shift) {
+function createPageConstructor(n, page_bits, page_shift, key) {
   var arglist = new Array(n)
   for(var i=0; i<n; ++i) {
     arglist[i] = "x"+i
@@ -22,7 +22,7 @@ function createPageConstructor(n, page_bits, page_shift) {
   
   //pages.add():
   code.push("proto.add=function(page){")
-    code.push(["this.pages[(interleave.apply(undefined, page.key)>>",page_shift,")&",(1<<page_bits)-1,"].push(page)"].join(""))
+    code.push(["this.pages[(interleave.apply(undefined, page['",key,"'])>>",page_shift,")&",(1<<page_bits)-1,"].push(page)"].join(""))
   code.push("}")
   
   //pages.get():
@@ -33,7 +33,7 @@ function createPageConstructor(n, page_bits, page_shift) {
   code.push(["proto.get=function(",arglist.join(","),"){",
     "var pages=this.pages[(interleave(",arglist.join(","),")>>",page_shift,")&",(1<<page_bits)-1,"],n=pages.length;",
     "for(var i=0;i<n;++i){",
-      "var p=pages[i],k=pages[i].key;",
+      "var p=pages[i],k=pages[i]['",key,"'];",
       "if(",matched.join("&&"),"){ return p }",
     "}",
     "return null }"
@@ -43,7 +43,7 @@ function createPageConstructor(n, page_bits, page_shift) {
   code.push(["proto.remove=function(", arglist.join(","), "){",
     "var pages=this.pages[(interleave(", arglist.join(","), ")>>",page_shift,")&", (1<<page_bits)-1,"],n=pages.length;",
     "for(var i=0;i<n;++i){",
-      "var k=pages[i].key;",
+      "var k=pages[i]['",key,"'];",
       "if(", matched.join("&&"), "){pages[i]=pages[pages.length-1];pages.pop();break;}",
     "}",
   "}"
@@ -57,14 +57,17 @@ function createPageConstructor(n, page_bits, page_shift) {
 }
 
 var CACHE = {}
-function createPageCache(dimension, bits, shift) {
+function createPageCache(dimension, bits, shift, key) {
   shift = shift || 0
-  var name = [dimension, bits, shift].join(":")
+  key = key || "key"
+  key = key.replace(/\'/g, "\\'")
+
+  var name = [dimension, bits, shift, key].join(":")
   var ctor = CACHE[name]
   if(ctor) {
     return new ctor()
   }
-  ctor = createPageConstructor(dimension, bits, shift)
+  ctor = createPageConstructor(dimension, bits, shift, key)
   CACHE[name] = ctor
   return new ctor()
 }
